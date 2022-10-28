@@ -4,22 +4,35 @@ import RootComponent from './root';
 import { IDAO } from './extpoints/dao_app';
 import MemberProposalAction from './actions/member_proposal_action';
 
+const getRootDom = (dom: any) =>
+  dom ? dom.querySelector('#root') : document.querySelector('#root');
+
 // 在首次加载和执行时会触发该函数
 export const provider = (props) => {
-   const root = props.dom
-     ? props.dom.querySelector("#root")
-     : document.querySelector("#root");
+   const root = getRootDom(props.dom);
+   const _root = root;
+   const _props = props;
 
-   console.log("provider props:", props);
+   console.log("provider props:", _props);
+
+  const render = () =>
+    ReactDOM.render(<RootComponent {..._props} />, _root);
 
    return {
      render() {
-       ReactDOM.render(<RootComponent {...props} />, root);
+      if (window.__GARFISH__) {
+        window?.Garfish.channel.on('stateChange', render);
+      }
+      
+      ReactDOM.render(<RootComponent {...props} />, root);
      },
      destroy({ dom }) {
-       ReactDOM.unmountComponentAtNode(
-         dom ? dom.querySelector("#root") : document.querySelector("#root")
-       );
+      if (window.__GARFISH__) {
+        window?.Garfish.channel.removeListener('stateChange', render);
+      }
+      ReactDOM.unmountComponentAtNode(
+        dom ? dom.querySelector('#root') : document.querySelector('#root'),
+      );
      },
    };
 };

@@ -258,9 +258,6 @@ const DaoRouter = () => {
           <Route exact path={`${path}/doc/:docId`}>
             <DaoDoc />
           </Route>
-          <Route exact path={`${path}/plugins/*`}>
-            <PluginOutlet />
-          </Route>
         </Switch>
       </PluginOutlet>
     </Layout>

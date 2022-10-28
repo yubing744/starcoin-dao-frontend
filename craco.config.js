@@ -99,7 +99,12 @@ module.exports = {
         const files = fs.readdirSync(path.resolve(__dirname, 'plugins'));
 
         files.forEach(plugin_name => {
-          devServer.app.use('/plugins/' + plugin_name, express.static(path.resolve(__dirname, 'plugins/' + plugin_name + '/dist')));
+          const plugin_dist = path.resolve(__dirname, 'plugins/' + plugin_name + '/dist');
+          devServer.app.use('/plugins/' + plugin_name, express.static(plugin_dist));
+
+          devServer.app.use('/plugins/' + plugin_name + '/**', function (req, res) {
+            res.sendfile(path.resolve(plugin_dist, 'index.html'), {maxAge: 0});
+          });
         });
       } catch (err) {
         console.log(err);

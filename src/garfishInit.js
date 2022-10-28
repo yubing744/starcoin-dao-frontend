@@ -39,7 +39,13 @@ export const GarfishInit = async basename => {
       'Garfish',
       '__GARFISH_GLOBAL_APP_LIFECYCLE__',
     ],
-    plugins: [GarfishEsModule(), GarfishCssScope(), AppLoader()],
+    plugins: [
+      GarfishEsModule(),
+      GarfishCssScope({
+        fixBodyGetter: true,
+      }),
+      AppLoader(),
+    ],
   };
 
   try {
