@@ -9,6 +9,7 @@ import DaoMetaForm from '../forms/daoMetaForm';
 import Layout from '../components/layout';
 import MainViewLayout from '../components/mainViewLayout';
 import { supportedChains } from '../utils/chain';
+import { Step, Steps, useSteps } from 'chakra-ui-steps';
 
 const Register = () => {
   const { registerchain, daoid } = useParams();
@@ -41,6 +42,22 @@ const Register = () => {
     history.push(`/dao/${ret.chainId}/${ret.daoAddress}`);
   };
 
+  const content = (
+    <Flex>
+      <p>asd</p>
+    </Flex>
+  );
+
+  const steps = [
+    { label: 'Step 1', content },
+    { label: 'Step 2', content },
+    { label: 'Step 3', content },
+  ];
+
+  const { nextStep, prevStep, setStep, reset, activeStep } = useSteps({
+    initialStep: 0,
+  });
+
   return (
     <Layout>
       <MainViewLayout header='Register'>
@@ -60,6 +77,39 @@ const Register = () => {
                     metadata={currentDao}
                   />
                 </Box>
+                {/* <Box w='40%'>
+                  <Flex flexDir='column' w='100%'>
+                    <Steps activeStep={activeStep} width='100%'>
+                      {steps.map(({ label, content }) => (
+                        <Step label={label} key={label}>
+                          {content}
+                        </Step>
+                      ))}
+                    </Steps>
+                    {activeStep === steps.length ? (
+                      <Flex p={4}>
+                        <Button mx='auto' size='sm' onClick={reset}>
+                          Reset
+                        </Button>
+                      </Flex>
+                    ) : (
+                      <Flex width='100%' justify='flex-end'>
+                        <Button
+                          isDisabled={activeStep === 0}
+                          mr={4}
+                          onClick={prevStep}
+                          size='sm'
+                          variant='ghost'
+                        >
+                          Prev
+                        </Button>
+                        <Button size='sm' onClick={nextStep}>
+                          {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                        </Button>
+                      </Flex>
+                    )}
+                  </Flex>
+                </Box> */}
               </>
             ) : (
               <Box
@@ -89,27 +139,8 @@ const Register = () => {
               fontWeight={700}
               ml={10}
             >
-              {`You need to switch your network to 
-                ${supportedChains[registerchain].name} to register this dao.`}
+              {`You need to switch your network to to register this dao.`}
             </Box>
-            {/* {!injectedChain ? (
-              <>
-                <Box
-                  fontSize='3xl'
-                  fontFamily='heading'
-                  fontWeight={700}
-                  mb={10}
-                >
-                  Connect your wallet to register your dao.
-                </Box>
-
-                <Flex direction='column' align='center'>
-                  <Button onClick={requestWallet}>Connect Wallet</Button>
-                </Flex>
-              </>
-            ) : (
-              
-            )} */}
           </Box>
         )}
       </MainViewLayout>
