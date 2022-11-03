@@ -10,6 +10,7 @@
 
 # production
 /build
+.fleet
 
 # misc
 .DS_Store

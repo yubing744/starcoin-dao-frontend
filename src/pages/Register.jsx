@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { BiArrowBack } from 'react-icons/bi';
 import { useHistory, useParams, Link as RouterLink } from 'react-router-dom';
 import { Flex, Icon, Box, Button } from '@chakra-ui/react';
@@ -8,8 +8,9 @@ import { useUser } from '../contexts/UserContext';
 import DaoMetaForm from '../forms/daoMetaForm';
 import Layout from '../components/layout';
 import MainViewLayout from '../components/mainViewLayout';
-import { supportedChains } from '../utils/chain';
 import { Step, Steps, useSteps } from 'chakra-ui-steps';
+import DaoAccountCreate from '../forms/daoAccountCreate';
+import DaoDeploy from '../forms/daoDeploy';
 
 const Register = () => {
   const { registerchain, daoid } = useParams();
@@ -18,6 +19,7 @@ const Register = () => {
   const { address, injectedChain, requestWallet } = useInjectedProvider();
   const [currentDao, setCurrentDao] = useState();
   const [needsNetworkChange, setNeedsNetworkChange] = useState();
+  const [blob, setBlob] = useState();
 
   useEffect(() => {
     if (address && injectedChain) {
@@ -28,7 +30,13 @@ const Register = () => {
         longDescription: '',
         purpose: '',
         summonerAddress: address,
+        members: address,
         version: '2.1',
+        voting_delay: 5,
+        voting_period: 20,
+        voting_quorum_rate: 5,
+        min_action_delay: 5,
+        min_proposal_deposit: 100000000,
       });
 
       setNeedsNetworkChange(injectedChain.chain_id !== registerchain);
@@ -42,22 +50,51 @@ const Register = () => {
     history.push(`/dao/${ret.chainId}/${ret.daoAddress}`);
   };
 
-  const content = (
-    <Flex>
-      <p>asd</p>
-    </Flex>
-  );
-
-  const steps = [
-    { label: 'Step 1', content },
-    { label: 'Step 2', content },
-    { label: 'Step 3', content },
-  ];
-
   const { nextStep, prevStep, setStep, reset, activeStep } = useSteps({
     initialStep: 0,
   });
 
+  const steps = [
+    {
+      label: 'Create Dao Account',
+      content: (
+        <DaoAccountCreate
+          next={v => {
+            currentDao.address = v;
+            nextStep();
+            console.log(currentDao);
+          }}
+        />
+      ),
+    },
+    {
+      label: 'Create Dao',
+      content: (
+        <DaoMetaForm
+          handleUpdate={handleUpdate}
+          metadata={currentDao}
+          next={v => {
+            setBlob(v);
+            nextStep();
+          }}
+        />
+      ),
+    },
+    {
+      label: 'Deploy',
+      content: (
+        <DaoDeploy
+          blob={blob}
+          handleUpdate={() => {
+            handleUpdate({
+              chainId: injectedChain.chainId,
+              daoAddress: currentDao.address,
+            });
+          }}
+        ></DaoDeploy>
+      ),
+    },
+  ];
   return (
     <Layout>
       <MainViewLayout header='Register'>
@@ -65,51 +102,22 @@ const Register = () => {
           <>
             {currentDao ? (
               <>
-                <Flex ml={6} justify='space-between' align='center' w='100%'>
-                  <Flex as={RouterLink} to='/' align='center'>
+                <Flex flexDir='column' width='100%'>
+                  <Flex as={RouterLink} to='/' align='center' mr={4} mb={4}>
                     <Icon as={BiArrowBack} color='secondary.500' mr={2} />
                     Back
                   </Flex>
-                </Flex>
-                <Box w='40%'>
-                  <DaoMetaForm
-                    handleUpdate={handleUpdate}
-                    metadata={currentDao}
-                  />
-                </Box>
-                {/* <Box w='40%'>
-                  <Flex flexDir='column' w='100%'>
-                    <Steps activeStep={activeStep} width='100%'>
-                      {steps.map(({ label, content }) => (
-                        <Step label={label} key={label}>
+
+                  <Steps activeStep={activeStep} width='100%'>
+                    {steps.map(({ label, content }) => (
+                      <Step label={label} key={label}>
+                        <Box w='100%' mt={4} mb={4} display='flex'>
                           {content}
-                        </Step>
-                      ))}
-                    </Steps>
-                    {activeStep === steps.length ? (
-                      <Flex p={4}>
-                        <Button mx='auto' size='sm' onClick={reset}>
-                          Reset
-                        </Button>
-                      </Flex>
-                    ) : (
-                      <Flex width='100%' justify='flex-end'>
-                        <Button
-                          isDisabled={activeStep === 0}
-                          mr={4}
-                          onClick={prevStep}
-                          size='sm'
-                          variant='ghost'
-                        >
-                          Prev
-                        </Button>
-                        <Button size='sm' onClick={nextStep}>
-                          {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                        </Button>
-                      </Flex>
-                    )}
-                  </Flex>
-                </Box> */}
+                        </Box>
+                      </Step>
+                    ))}
+                  </Steps>
+                </Flex>
               </>
             ) : (
               <Box

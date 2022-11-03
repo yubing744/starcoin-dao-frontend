@@ -19,6 +19,8 @@ import Textarea from './core/textarea';
 // Custom Chakra Components
 import ContentBoxComponent from './components/contentBox';
 import TextBoxComponent from './components/textBox';
+import { StepsStyleConfig, Steps } from 'chakra-ui-steps';
+import { MultiSelectTheme, MultiSelect } from 'chakra-multiselect';
 
 export const CARD_BG = '#0b0b0b';
 
@@ -32,6 +34,15 @@ export const createTheme = daoTheme => {
       return acc;
     }, {}),
   };
+
+  // const CustomSteps = {
+  //   ...Steps,
+  //   baseStyle: props => {
+  //     return {
+  //       ...Steps.baseStyle(props),
+  //     };
+  //   },
+  // };
 
   return extendTheme({
     active: true,
@@ -139,6 +150,30 @@ export const createTheme = daoTheme => {
       // custom components
       ContentBoxComponent,
       TextBoxComponent,
+      Steps: {
+        ...StepsStyleConfig,
+        baseStyle: props => {
+          const baseStyle = StepsStyleConfig.baseStyle(props);
+          baseStyle.label.color = '#FFFFF';
+          baseStyle.step.color = '#EB8A23';
+          return {
+            ...baseStyle,
+          };
+        },
+      },
+      MultiSelect: {
+        ...MultiSelectTheme,
+        baseStyle: props => {
+          const baseStyle = MultiSelectTheme.baseStyle(props);
+          baseStyle.list.bg = 'black';
+          baseStyle.item._active.bg = '#EB8A23';
+          baseStyle.button._active.bg = 'black';
+          baseStyle.button._focus.bg = 'black';
+          return {
+            ...baseStyle,
+          };
+        },
+      },
     },
     styles: {
       bgOverlayOpacity: themeOverrides.bgOverlayOpacity,

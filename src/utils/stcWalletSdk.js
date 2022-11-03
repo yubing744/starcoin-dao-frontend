@@ -4,6 +4,7 @@ import { hexlify } from '@ethersproject/bytes';
 export async function deployContract(injectedProvider, code) {
   let transactionHash;
 
+  console.log(code);
   const packageHex = hexlify(code);
   if (!packageHex.length) {
     alert('Contract blob hex is empty');

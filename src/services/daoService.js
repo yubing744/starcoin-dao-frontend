@@ -14,17 +14,19 @@ class DaoService {
     // download starcoin framework
     this.wasmfs.fs.mkdirpSync('/workspace/starcoin-framework/unit-test');
 
-    // const starcoinFrameworkURL =
-    //   process.env.NODE_ENV === 'production'
-    //     ? '/dapps/data/starcoin-framework.zip'
-    //     : '/data/starcoin-framework.zip';
+    // process.env.NODE_ENV === 'production'
+    // ? '/dapps/data/starcoin-framework.zip'
+    // : '/data/starcoin-framework.zip';
     const starcoinFrameworkURL = '/data/starcoin-framework.zip';
+
+    // download starcoin framework
+
     await this.git.download(
       starcoinFrameworkURL,
       '/workspace/starcoin-framework',
     );
 
-    // download starcoin framework
+    console.log(cfg);
 
     // render DAO package
     this.renderDAOPackage('/workspace/my-dao', cfg);
@@ -33,14 +35,22 @@ class DaoService {
       packagePath: '/workspace/my-dao',
       test: false,
       alias: new Map([['StarcoinFramework', '/workspace/starcoin-framework']]),
-      initFunction: '',
+      initFunction: `${cfg.address}::${cfg.name}::initialize`,
     });
 
     await mp.build();
+
     const blobBuf = this.wasmfs.fs.readFileSync(
       '/workspace/my-dao/target/starcoin/release/package.blob',
     );
-    return blobBuf;
+
+    const hash = this.wasmfs.fs.readFileSync(
+      '/workspace/my-dao/target/starcoin/release/hash.txt',
+    );
+    return {
+      blobBuf,
+      hash,
+    };
   }
 
   renderDAOPackage(destPath, cfg) {
@@ -68,6 +78,8 @@ class DaoService {
       cfg.purpose,
       cfg.tags,
       cfg.links,
+      cfg.plugins,
+      cfg.members,
 
       cfg.proposalConfig.voting_delay,
       cfg.proposalConfig.voting_period,
